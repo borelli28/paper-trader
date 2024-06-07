@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# VS Code .sln config files
+*.sln
+
 # dotenv files
 .env
 
