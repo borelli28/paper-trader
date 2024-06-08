@@ -9,4 +9,7 @@ public class User
     public string? Password { get; set; }
     [DataType(DataType.Date)]
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
+    [DataType(DataType.Date)]
+    public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
 }
