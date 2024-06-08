@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PaperTrader.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<PaperTraderContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("PaperTraderContext") ?? throw new InvalidOperationException("Connection string 'PaperTraderContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
