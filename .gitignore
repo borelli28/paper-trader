@@ -9,6 +9,10 @@
 # dotenv files
 .env
 
+# Models and DB related files
+*.db
+Migrations/
+
 # User-specific files
 *.rsuser
 *.suo
