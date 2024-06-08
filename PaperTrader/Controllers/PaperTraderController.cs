@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
 
-namespace MvcMovie.Controllers;
+namespace PaperTrader.Controllers;
 
 public class PaperTraderController : Controller
 {
-    // 
-    // GET: /HelloWorld/
+    // Each public controller is an endpoint
+    // GET: /PaperTrader/
     public string Index()
     {
         return "Hello";
