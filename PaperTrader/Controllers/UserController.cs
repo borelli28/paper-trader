@@ -66,6 +66,12 @@ namespace PaperTrader.Controllers
             return View(user);
         }
 
+        // GET: User/Authenticate
+        public IActionResult Authenticate()
+        {
+            return View();
+        }
+
         // POST: User/Authenticate
         [HttpPost]
         [ValidateAntiForgeryToken]
