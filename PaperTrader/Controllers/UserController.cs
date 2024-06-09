@@ -84,7 +84,7 @@ namespace PaperTrader.Controllers
                 {
                     if (userFromDb.Password == user.Password)
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Home", "Root"); // /Root/Home
                     }
                 }
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
