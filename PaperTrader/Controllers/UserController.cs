@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,32 @@ namespace PaperTrader.Controllers
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
+        // GET: User/Authenticate
+        public IActionResult Authenticate()
+        {
+            return View();
+        }
+
+        // POST: User/Authenticate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Authenticate([Bind("Username,Password")] User user)
+        {
+            if (ModelState.IsValid)
+            {
+                var userFromDb = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
+                if (userFromDb != null)
+                {
+                    if (userFromDb.Password == user.Password)
+                    {
+                        return RedirectToAction("Home", "Root"); // /Root/Home
+                    }
+                }
+                ModelState.AddModelError(string.Empty, "Invalid username or password.");
             }
             return View(user);
         }
