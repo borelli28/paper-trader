@@ -11,6 +11,7 @@
 
 # Models and DB related files
 *.db
+*.db*
 Migrations/
 
 # User-specific files
