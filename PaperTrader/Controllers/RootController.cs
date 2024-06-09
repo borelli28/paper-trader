@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using PaperTrader.Models;
 
 namespace PaperTrader.Controllers;
