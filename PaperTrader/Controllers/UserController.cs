@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,37 @@ namespace PaperTrader.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            return View(user);
+        }
+
+        // POST: User/Authenticate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Authenticate([Bind("Username,Password")] User user)
+        {
+            if (ModelState.IsValid)
+            {
+                // Get the user from the database using the provided username
+                var userFromDb = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
+
+                if (userFromDb != null)
+                {
+                    // Compare the provided password with the password stored in the database
+                    if (userFromDb.Password == user.Password)
+                    {
+                        // Username and password match, so authenticate the user
+                        // You can store user information in the session or generate a token for authentication
+
+                        // Redirect to the desired action or view
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+
+                // Username or password is incorrect
+                ModelState.AddModelError(string.Empty, "Invalid username or password.");
+            }
+
+            // If we got this far, something failed
             return View(user);
         }
 
