@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
 using System.Diagnostics;
 using PaperTrader.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace PaperTrader.Controllers;
 
@@ -19,9 +21,16 @@ public class AppController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
+    public IActionResult Home()
     {
-        return View();
+        if (User.Identity.IsAuthenticated)
+        {
+            return View();
+        }
+        else
+        {
+            return RedirectToAction("Login", "User");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

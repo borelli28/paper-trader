@@ -1,12 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PaperTrader.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
 builder.Services.AddDbContext<PaperTraderContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("PaperTraderContext") ?? throw new InvalidOperationException("Connection string 'PaperTraderContext' not found.")));
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = "/User/Login";
+});
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -14,7 +27,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/App/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -23,6 +35,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
