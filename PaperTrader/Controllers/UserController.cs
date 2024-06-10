@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Azure.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +79,13 @@ namespace PaperTrader.Controllers
                 {
                     if (userFromDb.Password == user.Password)
                     {
-                        return RedirectToAction("Home", "App"); // /App/Home
+                        // Set the authentication cookie
+                        await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(new[]
+                        {
+                            new Claim(ClaimTypes.Name, userFromDb.Username)
+                        }, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)));
+
+                        return RedirectToAction("Home", "App");
                     }
                 }
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
