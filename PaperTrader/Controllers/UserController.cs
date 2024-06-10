@@ -66,16 +66,16 @@ namespace PaperTrader.Controllers
             return View(user);
         }
 
-        // GET: User/Authenticate
-        public IActionResult Authenticate()
+        // GET: User/Login
+        public IActionResult Login()
         {
             return View();
         }
 
-        // POST: User/Authenticate
+        // POST: User/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Authenticate([Bind("Username,Password")] User user)
+        public async Task<IActionResult> Login([Bind("Username,Password")] User user)
         {
             if (ModelState.IsValid)
             {
