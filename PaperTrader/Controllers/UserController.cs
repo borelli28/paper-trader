@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PaperTrader.Data;
 using PaperTrader.Models;
+using System.Security.Claims;
+using NuGet.Packaging.Signing;
 
 namespace PaperTrader.Controllers
 {
@@ -25,25 +27,39 @@ namespace PaperTrader.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.User.ToListAsync());
+            if (User.Identity.IsAuthenticated)
+            {
+                return View(await _context.User.ToListAsync());
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+                var user = await _context.User
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return View(user);
+            } 
+            else 
             {
-                return NotFound();
+                return RedirectToAction("Login", "User");
             }
-
-            return View(user);
         }
 
         public IActionResult Register()
@@ -97,17 +113,24 @@ namespace PaperTrader.Controllers
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (User.Identity.IsAuthenticated) 
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
+                var user = await _context.User.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
             }
-            return View(user);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // POST: User/Edit/5
@@ -115,50 +138,63 @@ namespace PaperTrader.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,CreatedAt")] User user)
         {
-            if (id != user.Id)
+            if (User.Identity.IsAuthenticated)
             {
-                return NotFound();
-            }
+                if (id != user.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(user);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!UserExists(user.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                return View(user);
             }
-            return View(user);
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         // GET: User/Delete/5
         public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+        {   if (User.Identity.IsAuthenticated)
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+                var user = await _context.User
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return View(user);
+            }
+            else
             {
-                return NotFound();
+                return RedirectToAction("Login", "User");
             }
-
-            return View(user);
         }
 
         // POST: User/Delete/5
@@ -166,14 +202,21 @@ namespace PaperTrader.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
+            if (User.Identity.IsAuthenticated)
             {
-                _context.User.Remove(user);
-            }
+                var user = await _context.User.FindAsync(id);
+                if (user != null)
+                {
+                    _context.User.Remove(user);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
 
         private bool UserExists(int id)
