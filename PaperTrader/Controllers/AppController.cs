@@ -5,11 +5,11 @@ using PaperTrader.Models;
 
 namespace PaperTrader.Controllers;
 
-public class RootController : Controller
+public class AppController : Controller
 {
-    private readonly ILogger<RootController> _logger;
+    private readonly ILogger<AppController> _logger;
 
-    public RootController(ILogger<RootController> logger)
+    public AppController(ILogger<AppController> logger)
     {
         _logger = logger;
     }
