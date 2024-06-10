@@ -20,7 +20,6 @@ namespace PaperTrader.Controllers
             _context = context;
         }
 
-        // GET: User
         public async Task<IActionResult> Index()
         {
             return View(await _context.User.ToListAsync());
@@ -62,13 +61,11 @@ namespace PaperTrader.Controllers
             return View(user);
         }
 
-        // GET: User/Login
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST: User/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("Username,Password")] User user)
@@ -105,8 +102,6 @@ namespace PaperTrader.Controllers
         }
 
         // POST: User/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,CreatedAt")] User user)
