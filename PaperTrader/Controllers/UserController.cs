@@ -31,7 +31,13 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return View(await _context.User.ToListAsync());
+                var loggedUsername = User.Identity.Name;
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Username == loggedUsername);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
             }
             else
             {
