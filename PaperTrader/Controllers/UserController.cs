@@ -11,14 +11,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PaperTrader.Data;
 using PaperTrader.Models;
-using System.Security.Claims;
 using NuGet.Packaging.Signing;
+using Microsoft.AspNetCore.Identity;
 
 namespace PaperTrader.Controllers
 {
     public class UserController : Controller
     {
         private readonly PaperTraderContext _context;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
         public UserController(PaperTraderContext context)
         {
@@ -73,6 +74,8 @@ namespace PaperTrader.Controllers
         {
             if (ModelState.IsValid)
             {
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
+
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "User");
