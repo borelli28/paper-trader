@@ -165,14 +165,13 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var loggedUsername = User.Identity.Name;
-
                 if (id != user.Id)
                 {
                     return NotFound();
                 }
 
-                else if (user.Username != loggedUsername)
+                string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (user.Id.ToString() != loggedInUserId)
                 {
                     return Unauthorized();
                 }
