@@ -181,6 +181,7 @@ namespace PaperTrader.Controllers
                 {
                     try
                     {
+                        user.Password = _passwordHasher.HashPassword(user, user.Password);
                         _context.Update(user);
                         await _context.SaveChangesAsync();
                     }
