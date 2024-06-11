@@ -21,9 +21,10 @@ namespace PaperTrader.Controllers
         private readonly PaperTraderContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserController(PaperTraderContext context)
+        public UserController(PaperTraderContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<IActionResult> Index()
