@@ -201,14 +201,17 @@ namespace PaperTrader.Controllers
                 {
                     return NotFound();
                 }
-
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
                 }
-
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
+                }
                 return View(user);
             }
             else
@@ -224,13 +227,21 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User.FindAsync(id);
-                if (user != null)
-                {
-                    _context.User.Remove(user);
-                }
 
-                await _context.SaveChangesAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
+                }
+                else {
+                    _context.User.Remove(user);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
             else
