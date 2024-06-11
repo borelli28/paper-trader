@@ -31,7 +31,13 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return View(await _context.User.ToListAsync());
+                var loggedUsername = User.Identity.Name;
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Username == loggedUsername);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
             }
             else
             {
@@ -49,11 +55,16 @@ namespace PaperTrader.Controllers
                     return NotFound();
                 }
 
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
+                }
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
                 }
 
                 return View(user);
@@ -75,8 +86,14 @@ namespace PaperTrader.Controllers
         {
             if (ModelState.IsValid)
             {
-                user.Password = _passwordHasher.HashPassword(user, user.Password);
+                var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("Username", "Please choose a different username.");
+                    return View(user);
+                }
 
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "User");
@@ -123,11 +140,15 @@ namespace PaperTrader.Controllers
                 {
                     return NotFound();
                 }
-
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User.FindAsync(id);
                 if (user == null)
                 {
                     return NotFound();
+                }
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
                 }
                 return View(user);
             }
@@ -144,9 +165,16 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                var loggedUsername = User.Identity.Name;
+
                 if (id != user.Id)
                 {
                     return NotFound();
+                }
+
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
                 }
 
                 if (ModelState.IsValid)
@@ -185,14 +213,17 @@ namespace PaperTrader.Controllers
                 {
                     return NotFound();
                 }
-
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
                 }
-
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
+                }
                 return View(user);
             }
             else
@@ -208,13 +239,21 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                var loggedUsername = User.Identity.Name;
                 var user = await _context.User.FindAsync(id);
-                if (user != null)
-                {
-                    _context.User.Remove(user);
-                }
 
-                await _context.SaveChangesAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
+                }
+                else {
+                    _context.User.Remove(user);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
             else
