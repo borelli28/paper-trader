@@ -49,11 +49,17 @@ namespace PaperTrader.Controllers
                     return NotFound();
                 }
 
+                var loggedUsername = User.Identity.Name; // Get username of logged user
+
                 var user = await _context.User
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
+                }
+                else if (user.Username != loggedUsername)
+                {
+                    return Unauthorized();
                 }
 
                 return View(user);
