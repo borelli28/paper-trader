@@ -97,11 +97,10 @@ namespace PaperTrader.Controllers
             {
                 var userFromDb = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
                 if (userFromDb != null)
-                {   
-                    user.Password = _passwordHasher.HashPassword(user, user.Password);
-                    if (userFromDb.Password == user.Password)
+                {
+                    var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userFromDb, userFromDb.Password, user.Password);
+                    if (passwordVerificationResult == PasswordVerificationResult.Success)
                     {
-                        // Set the authentication cookie
                         await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(new[]
                         {
                             new Claim(ClaimTypes.Name, userFromDb.Username)
