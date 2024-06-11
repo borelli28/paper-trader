@@ -11,18 +11,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PaperTrader.Data;
 using PaperTrader.Models;
-using System.Security.Claims;
 using NuGet.Packaging.Signing;
+using Microsoft.AspNetCore.Identity;
 
 namespace PaperTrader.Controllers
 {
     public class UserController : Controller
     {
         private readonly PaperTraderContext _context;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserController(PaperTraderContext context)
+        public UserController(PaperTraderContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<IActionResult> Index()
@@ -73,6 +75,8 @@ namespace PaperTrader.Controllers
         {
             if (ModelState.IsValid)
             {
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
+
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "User");
@@ -94,9 +98,9 @@ namespace PaperTrader.Controllers
                 var userFromDb = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
                 if (userFromDb != null)
                 {
-                    if (userFromDb.Password == user.Password)
+                    var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userFromDb, userFromDb.Password, user.Password);
+                    if (passwordVerificationResult == PasswordVerificationResult.Success)
                     {
-                        // Set the authentication cookie
                         await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(new[]
                         {
                             new Claim(ClaimTypes.Name, userFromDb.Username)
