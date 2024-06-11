@@ -86,8 +86,14 @@ namespace PaperTrader.Controllers
         {
             if (ModelState.IsValid)
             {
-                user.Password = _passwordHasher.HashPassword(user, user.Password);
+                var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Username == user.Username);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("Username", "Please choose a different username.");
+                    return View(user);
+                }
 
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Login", "User");
