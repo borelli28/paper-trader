@@ -118,11 +118,15 @@ namespace PaperTrader.Controllers
                     var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userFromDb, userFromDb.Password, user.Password);
                     if (passwordVerificationResult == PasswordVerificationResult.Success)
                     {
-                        await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(new[]
+                        var claims = new List<Claim>
                         {
-                            new Claim(ClaimTypes.Name, userFromDb.Username)
-                        }, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)));
+                            new Claim(ClaimTypes.Name, userFromDb.Username),
+                            new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString())
+                        };
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
                         return RedirectToAction("Home", "App");
                     }
                 }
@@ -165,16 +169,21 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (id != user.Id)
                 {
                     return NotFound();
                 }
 
-                string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (user.Id.ToString() != loggedInUserId)
-                {
+                {   
                     return Unauthorized();
                 }
+                /*
+                    {"message":"User ID: 18 and logged in user ID: "}
+                    loggedInUserId is returning null because the user id is not being set on login on the claims thingy
+                    Need to find another way to get the logged user id or maybe implement the code chatgpt gave me
+                */
 
                 if (ModelState.IsValid)
                 {
