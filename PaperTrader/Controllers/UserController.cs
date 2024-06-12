@@ -258,6 +258,7 @@ namespace PaperTrader.Controllers
                 {
                     _context.User.Remove(user);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "User deleted successfully!";
                 }
                 return RedirectToAction("Index", "App");
             }
