@@ -2,6 +2,15 @@
     ViewData["Title"] = "App Page";
 }
 
+@{
+    if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+}
+
 <div class="text-center">
     <h1 class="display-4">Paper Trader</h1>
     <p>To continue, please login or register:</p>

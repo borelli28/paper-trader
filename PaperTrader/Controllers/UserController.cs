@@ -92,6 +92,7 @@ namespace PaperTrader.Controllers
                 user.Password = _passwordHasher.HashPassword(user, user.Password);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "User created successfully!";
                 return RedirectToAction("Login", "User");
             }
             return View(user);
