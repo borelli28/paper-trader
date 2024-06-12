@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PaperTrader.Data;
 using PaperTrader.Models;
-using NuGet.Packaging.Signing;
 using Microsoft.AspNetCore.Identity;
 
 namespace PaperTrader.Controllers
@@ -31,8 +28,8 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var loggedUsername = User.Identity.Name;
-                var user = await _context.User.FirstOrDefaultAsync(u => u.Username == loggedUsername);
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
                 if (user == null)
                 {
                     return NotFound();
@@ -55,14 +52,13 @@ namespace PaperTrader.Controllers
                     return NotFound();
                 }
 
-                var loggedUsername = User.Identity.Name;
-                var user = await _context.User
-                    .FirstOrDefaultAsync(m => m.Id == id);
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
                 }
-                else if (user.Username != loggedUsername)
+                else if (user.Id.ToString() != loggedInUserId)
                 {
                     return Unauthorized();
                 }
@@ -118,11 +114,15 @@ namespace PaperTrader.Controllers
                     var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(userFromDb, userFromDb.Password, user.Password);
                     if (passwordVerificationResult == PasswordVerificationResult.Success)
                     {
-                        await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(new[]
+                        var claims = new List<Claim>
                         {
-                            new Claim(ClaimTypes.Name, userFromDb.Username)
-                        }, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)));
+                            new Claim(ClaimTypes.Name, userFromDb.Username),
+                            new Claim(ClaimTypes.NameIdentifier, userFromDb.Id.ToString())
+                        };
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
                         return RedirectToAction("Home", "App");
                     }
                 }
@@ -140,13 +140,14 @@ namespace PaperTrader.Controllers
                 {
                     return NotFound();
                 }
-                var loggedUsername = User.Identity.Name;
+
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var user = await _context.User.FindAsync(id);
                 if (user == null)
                 {
                     return NotFound();
                 }
-                else if (user.Username != loggedUsername)
+                else if (user.Id.ToString() != loggedInUserId)
                 {
                     return Unauthorized();
                 }
@@ -165,15 +166,14 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var loggedUsername = User.Identity.Name;
-
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (id != user.Id)
                 {
                     return NotFound();
                 }
 
-                else if (user.Username != loggedUsername)
-                {
+                if (user.Id.ToString() != loggedInUserId)
+                {   
                     return Unauthorized();
                 }
 
@@ -208,20 +208,21 @@ namespace PaperTrader.Controllers
 
         // GET: User/Delete/5
         public async Task<IActionResult> Delete(int? id)
-        {   if (User.Identity.IsAuthenticated)
+        {   
+            if (User.Identity.IsAuthenticated)
             {
                 if (id == null)
                 {
                     return NotFound();
                 }
-                var loggedUsername = User.Identity.Name;
-                var user = await _context.User
-                    .FirstOrDefaultAsync(m => m.Id == id);
+
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
                 if (user == null)
                 {
                     return NotFound();
                 }
-                else if (user.Username != loggedUsername)
+                else if (user.Id.ToString() != loggedInUserId)
                 {
                     return Unauthorized();
                 }
@@ -240,18 +241,19 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var loggedUsername = User.Identity.Name;
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var user = await _context.User.FindAsync(id);
 
                 if (user == null)
                 {
                     return NotFound();
                 }
-                else if (user.Username != loggedUsername)
+                else if (user.Id.ToString() != loggedInUserId)
                 {
                     return Unauthorized();
                 }
-                else {
+                else 
+                {
                     _context.User.Remove(user);
                     await _context.SaveChangesAsync();
                 }
