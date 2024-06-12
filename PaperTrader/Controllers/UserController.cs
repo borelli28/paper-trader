@@ -257,7 +257,7 @@ namespace PaperTrader.Controllers
                     _context.User.Remove(user);
                     await _context.SaveChangesAsync();
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "App");
             }
             else
             {
