@@ -14,4 +14,6 @@ public class User
     public string? Password { get; set; }
     [DataType(DataType.Date)]
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
+    public required ICollection<Portfolio> Portfolios { get; set; }
 }
