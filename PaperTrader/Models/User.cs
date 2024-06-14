@@ -15,5 +15,5 @@ public class User
     [DataType(DataType.Date)]
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-    public required ICollection<Portfolio> Portfolios { get; set; }
+    public ICollection<Portfolio>? Portfolios { get; set; }
 }
