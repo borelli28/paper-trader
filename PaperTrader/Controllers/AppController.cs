@@ -31,7 +31,7 @@ public class AppController : Controller
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _context.User
-                                    .Include(u => u.Portfolios) // Include portfolios for the user
+                                    .Include(u => u.Portfolios)
                                     .FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
 
             if (user == null)
