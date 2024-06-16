@@ -6,28 +6,32 @@
 
 <div class="text-center">
     <h1 class="display-4">Paper Trader</h1>
-    <h4>Your Portfolio's</h4>
-    <div>
-        <p>Tech/AI</p>
-        <p>Net Gain: +33%</p>
-        <p>Balance: $10,250</p>
-    </div>
+    <h4>Your Portfolios</h4>
 
-    <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                @Model.Username
-            </td>
-        </tr>
-    </tbody>
-</table>
+    @foreach (var portfolio in Model.Portfolios)
+    {
+        <div>
+            <h5>@portfolio.Name</h5>
+            <p>Net Gain: +33%</p>
+            <p>Balance: $@portfolio.Cash</p>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Username)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Model.Username
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
 </div>
