@@ -1,19 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
 using System.Diagnostics;
+using PaperTrader.Data;
 using PaperTrader.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace PaperTrader.Controllers;
 
 public class AppController : Controller
 {
     private readonly ILogger<AppController> _logger;
+    private readonly PaperTraderContext _context;
 
-    public AppController(ILogger<AppController> logger)
+    public AppController(ILogger<AppController> logger, PaperTraderContext context)
     {
         _logger = logger;
+        _context = context;
     }
 
     public IActionResult Index()
@@ -21,11 +25,22 @@ public class AppController : Controller
         return View();
     }
 
-    public IActionResult Home()
+    public async Task<IActionResult> Home()
     {
         if (User.Identity.IsAuthenticated)
         {
-            return View();
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            else if (user.Id.ToString() != loggedInUserId)
+            {
+                return Unauthorized();
+            }
+
+            return View(user);
         }
         else
         {
