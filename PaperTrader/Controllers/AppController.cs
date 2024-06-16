@@ -30,14 +30,13 @@ public class AppController : Controller
         if (User.Identity.IsAuthenticated)
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _context.User.FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
+            var user = await _context.User
+                                    .Include(u => u.Portfolios) // Include portfolios for the user
+                                    .FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
+
             if (user == null)
             {
                 return NotFound();
-            }
-            else if (user.Id.ToString() != loggedInUserId)
-            {
-                return Unauthorized();
             }
 
             return View(user);
