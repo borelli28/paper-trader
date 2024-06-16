@@ -13,4 +13,5 @@ public class Portfolio
 
     public int UserId { get; set; }
     public required User User { get; set; }
+    public ICollection<Stock>? Stocks { get; set; }
 }
