@@ -104,7 +104,7 @@ namespace PaperTrader.Controllers
                 _context.Portfolio.Add(portfolio);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Portfolio created successfully!";
-                return RedirectToAction("Index");
+                return RedirectToAction("Home");
             }
 
             return View(portfolio);
