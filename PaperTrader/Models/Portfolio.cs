@@ -12,6 +12,6 @@ public class Portfolio
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
     public int UserId { get; set; }
-    public required User User { get; set; }
+    public User User { get; set; }
     public ICollection<Stock>? Stocks { get; set; }
 }
