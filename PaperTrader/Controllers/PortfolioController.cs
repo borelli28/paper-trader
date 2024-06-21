@@ -110,6 +110,10 @@ namespace PaperTrader.Controllers
                 _logger.LogInformation("Portfolio created!");
                 return RedirectToAction("Home", "App");
             }
+            else
+            {
+                _logger.LogWarning("ModelState is invalid");
+            }
 
             return View(portfolio);
         }
