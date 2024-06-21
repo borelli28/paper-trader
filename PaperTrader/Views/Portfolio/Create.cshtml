@@ -1,4 +1,4 @@
-@model PaperTrader.Models.User
+@model PaperTrader.Models.Portfolio
 
 @{
     ViewData["Title"] = "Create Portfolio";
@@ -23,9 +23,9 @@
     </div>
 </div>
 
-@* <div>
+<div>
     <a asp-controller="App" asp-action="Index">Go back</a>
-</div> *@
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
