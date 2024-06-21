@@ -102,12 +102,11 @@ namespace PaperTrader.Controllers
                     ModelState.AddModelError("Name", "Please choose a different Name.");
                     return View(portfolio);
                 }
-                _logger.LogInformation("No portfolio name collition");
+
                 portfolio.UserId = user.Id;
                 _context.Portfolio.Add(portfolio);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Portfolio created successfully!";
-                _logger.LogInformation("Portfolio created!");
                 return RedirectToAction("Home", "App");
             }
             else
