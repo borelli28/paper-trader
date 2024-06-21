@@ -16,10 +16,12 @@ namespace PaperTrader.Controllers
     public class PortfolioController : Controller
     {
         private readonly PaperTraderContext _context;
+        private readonly ILogger<PortfolioController> _logger;
 
-        public PortfolioController(PaperTraderContext context)
+        public PortfolioController(PaperTraderContext context, ILogger<PortfolioController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -79,10 +81,11 @@ namespace PaperTrader.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Portfolio portfolio)
+        public async Task<IActionResult> Create([Bind("Name")] Portfolio portfolio)
         {
             if (ModelState.IsValid)
             {
+                _logger.LogInformation("Modelstate is valid");
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var user = await _context.User.FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
 
@@ -99,12 +102,13 @@ namespace PaperTrader.Controllers
                     ModelState.AddModelError("Name", "Please choose a different Name.");
                     return View(portfolio);
                 }
-
+                _logger.LogInformation("No portfolio name collition");
                 portfolio.UserId = user.Id;
                 _context.Portfolio.Add(portfolio);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Portfolio created successfully!";
-                return RedirectToAction("Home");
+                _logger.LogInformation("Portfolio created!");
+                return RedirectToAction("Home", "App");
             }
 
             return View(portfolio);
