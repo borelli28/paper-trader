@@ -113,6 +113,13 @@ namespace PaperTrader.Controllers
             else
             {
                 _logger.LogWarning("ModelState is invalid");
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _logger.LogWarning($"ModelState Error: {error.ErrorMessage}");
+                    }
+                }
             }
 
             return View(portfolio);
