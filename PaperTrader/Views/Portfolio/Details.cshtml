@@ -11,6 +11,8 @@
         <p>Net Gain: +33%</p>
         <p>Balance: $@Html.DisplayFor(model => model.Cash)</p>
         <p>Created At: @Html.DisplayFor(model => model.CreatedAt)</p>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
     </div>
     <div>
         <h4>Stocks</h4>
