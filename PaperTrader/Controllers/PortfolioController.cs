@@ -153,6 +153,48 @@ namespace PaperTrader.Controllers
                 return RedirectToAction("Login", "User");
             }
         }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Cash")] Portfolio portfolio)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (portfolio.UserId.ToString() != loggedInUserId)
+                {   
+                    return Unauthorized();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(portfolio);
+                        await _context.SaveChangesAsync();
+                        TempData["SuccessMessage"] = "Portfolio updated successfully!";
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!PortfolioExists(portfolio.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction("Details", new { id = portfolio.Id });
+                }
+                return View(portfolio);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
 
     }
 }
