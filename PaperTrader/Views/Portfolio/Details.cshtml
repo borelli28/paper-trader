@@ -1,0 +1,18 @@
+@model PaperTrader.Models.Portfolio
+
+@{
+    ViewData["Title"] = "Portfolio";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Paper Trader</h1>
+    <h4>@Html.DisplayNameFor(model => model.Name)</h4>
+
+    {
+        <div>
+            <h5>@Html.DisplayNameFor(model => model.Name)</h5>
+            <p>Net Gain: +33%</p>
+            <p>Balance: $@Html.DisplayNameFor(model => model.Cash)</p>
+        </div>
+    }
+</div>
