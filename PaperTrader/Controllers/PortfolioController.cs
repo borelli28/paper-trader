@@ -124,6 +124,35 @@ namespace PaperTrader.Controllers
 
             return View(portfolio);
         }
+        
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (User.Identity.IsAuthenticated) 
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(m => m.Id.ToString() == loggedInUserId);
+                var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == id);
+                if (portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
+                    return Unauthorized();
+                }
+
+                return View(portfolio);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
 
     }
 }
