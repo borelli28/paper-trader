@@ -1,13 +1,20 @@
+@model PaperTrader.Models.User
+
 @{
     ViewData["Title"] = "Home";
 }
 
 <div class="text-center">
     <h1 class="display-4">Paper Trader</h1>
-    <h4>Your Portfolio's</h4>
-    <div>
-        <p>Tech/AI</p>
-        <p>Net Gain: +33%</p>
-        <p>Balance: $10,250</p>
-    </div>
+    <h4>Your Portfolios</h4>
+
+    @foreach (var portfolio in Model.Portfolios)
+    {
+        <div>
+            <h5>@portfolio.Name</h5>
+            <p>Net Gain: +33%</p>
+            <p>Balance: $@portfolio.Cash</p>
+            <a asp-controller="Portfolio" asp-action="Details" asp-route-id="@portfolio.Id">Go</a>
+        </div>
+    }
 </div>
