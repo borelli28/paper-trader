@@ -195,6 +195,11 @@ namespace PaperTrader.Controllers
                 return RedirectToAction("Login", "User");
             }
         }
+        
+        private bool PortfolioExists(int id)
+        {
+            return _context.User.Any(e => e.Id == id);
+        }
 
     }
 }
