@@ -56,15 +56,16 @@ namespace PaperTrader.Controllers
                 }
 
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(m => m.Id == loggedInUserId);
                 var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == portfolioId);
                 if (portfolio == null)
                 {
                     return NotFound();
                 }
-                // else if (user.portfolioId.ToString() != loggedInUserId)
-                // {
-                //     return Unauthorized();
-                // }
+                else if (user.Id != portfolio.UserId)
+                {
+                    return Unauthorized();
+                }
 
                 return View(portfolio);
             } 
