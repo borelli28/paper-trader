@@ -167,7 +167,7 @@ namespace PaperTrader.Controllers
 
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                if (portfolio == null)
+                else if (portfolio == null)
                 {
                     return NotFound();
                 }
@@ -207,7 +207,7 @@ namespace PaperTrader.Controllers
         
         private bool PortfolioExists(int id)
         {
-            return _context.User.Any(e => e.Id == id);
+            return _context.Portfolio.Any(e => e.Id == id);
         }
 
     }
