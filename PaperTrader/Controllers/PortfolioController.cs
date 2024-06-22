@@ -156,18 +156,27 @@ namespace PaperTrader.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Cash")] Portfolio portfolio)
+        public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Cash")] Portfolio portfolio)
         {
             if (User.Identity.IsAuthenticated)
             {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                if (portfolio.UserId.ToString() != loggedInUserId)
-                {   
+                if (portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
                     return Unauthorized();
                 }
 
-                if (ModelState.IsValid)
+                else if (ModelState.IsValid)
                 {
                     try
                     {
