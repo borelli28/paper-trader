@@ -6,13 +6,11 @@
 
 <div class="text-center">
     <h1 class="display-4">Paper Trader</h1>
-    <h4>@Html.DisplayNameFor(model => model.Name)</h4>
 
-    {
-        <div>
-            <h5>@Html.DisplayNameFor(model => model.Name)</h5>
-            <p>Net Gain: +33%</p>
-            <p>Balance: $@Html.DisplayNameFor(model => model.Cash)</p>
-        </div>
-    }
+    <div>
+        <h5>@Html.DisplayNameFor(model => model.Name): @Html.DisplayFor(model => model.Name)</h5>
+        <p>Net Gain: +33%</p>
+        <p>Balance: $@Html.DisplayFor(model => model.Cash)</p>
+        <p>@Html.DisplayNameFor(model => model.CreatedAt): @Html.DisplayFor(model => model.CreatedAt)</p>
+    </div>
 </div>
