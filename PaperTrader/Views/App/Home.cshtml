@@ -14,6 +14,7 @@
             <h5>@portfolio.Name</h5>
             <p>Net Gain: +33%</p>
             <p>Balance: $@portfolio.Cash</p>
+            <a asp-controller="Portfolio" asp-action="Details" asp-route-id="@portfolio.Id">Go</a>
         </div>
     }
 </div>
