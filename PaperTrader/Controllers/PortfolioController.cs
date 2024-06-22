@@ -46,7 +46,7 @@ namespace PaperTrader.Controllers
             }
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? portfolioId)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -56,8 +56,8 @@ namespace PaperTrader.Controllers
                 }
 
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
-                if (user == null)
+                var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == portfolioId);
+                if (portfolio == null)
                 {
                     return NotFound();
                 }
@@ -66,7 +66,7 @@ namespace PaperTrader.Controllers
                     return Unauthorized();
                 }
 
-                return View(user);
+                return View(portfolio);
             } 
             else 
             {
