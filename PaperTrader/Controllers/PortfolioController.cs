@@ -50,7 +50,7 @@ namespace PaperTrader.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                if (id == null)
+                if (portfolioId == null)
                 {
                     return NotFound();
                 }
@@ -61,10 +61,10 @@ namespace PaperTrader.Controllers
                 {
                     return NotFound();
                 }
-                else if (user.Id.ToString() != loggedInUserId)
-                {
-                    return Unauthorized();
-                }
+                // else if (user.portfolioId.ToString() != loggedInUserId)
+                // {
+                //     return Unauthorized();
+                // }
 
                 return View(portfolio);
             } 
