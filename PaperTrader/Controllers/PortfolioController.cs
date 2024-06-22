@@ -156,53 +156,55 @@ namespace PaperTrader.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Cash")] Portfolio portfolio)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Cash")] Portfolio portfolio)
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-
-                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                else if (portfolio == null)
-                {
-                    return NotFound();
-                }
-                else if (portfolio.UserId.ToString() != loggedInUserId)
-                {
-                    return Unauthorized();
-                }
-
-                else if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        _context.Update(portfolio);
-                        await _context.SaveChangesAsync();
-                        TempData["SuccessMessage"] = "Portfolio updated successfully!";
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!PortfolioExists(portfolio.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction("Details", new { id = portfolio.Id });
-                }
-                return View(portfolio);
-            }
-            else
+            if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "User");
             }
+        
+            if (id != portfolio.Id)
+            {
+                return NotFound();
+            }
+        
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var existingPortfolio = await _context.Portfolio.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+        
+            if (existingPortfolio == null)
+            {
+                return NotFound();
+            }
+        
+            if (existingPortfolio.UserId.ToString() != loggedInUserId)
+            {
+                return Unauthorized();
+            }
+        
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    portfolio.UserId = existingPortfolio.UserId;
+                    _context.Update(portfolio);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Portfolio updated successfully!";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PortfolioExists(portfolio.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Details), new { id = portfolio.Id });
+            }
+        
+            return View(portfolio);
         }
         
         private bool PortfolioExists(int id)
