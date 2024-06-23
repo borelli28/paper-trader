@@ -212,5 +212,63 @@ namespace PaperTrader.Controllers
             return _context.Portfolio.Any(e => e.Id == id);
         }
 
+        public async Task<IActionResult> Delete(int? id)
+        {   
+            if (User.Identity.IsAuthenticated)
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == id);
+                if (portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
+                    return Unauthorized();
+                }
+                return View(portfolio);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var portfolio = await _context.Portfolio.FindAsync(id);
+
+                if (portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
+                    return Unauthorized();
+                }
+                else 
+                {
+                    _context.Portfolio.Remove(portfolio);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Portfolio deleted successfully!";
+                }
+                return RedirectToAction("Home", "App");
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
+
     }
 }
