@@ -42,7 +42,6 @@ namespace PaperTrader.Controllers
             }
         }
 
-        // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (User.Identity.IsAuthenticated)
@@ -132,7 +131,6 @@ namespace PaperTrader.Controllers
             return View(user);
         }
 
-        // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (User.Identity.IsAuthenticated) 
@@ -160,7 +158,6 @@ namespace PaperTrader.Controllers
             }
         }
 
-        // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,CreatedAt")] User user)
@@ -208,7 +205,6 @@ namespace PaperTrader.Controllers
             }
         }
 
-        // GET: User/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {   
             if (User.Identity.IsAuthenticated)
@@ -236,7 +232,6 @@ namespace PaperTrader.Controllers
             }
         }
 
-        // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
