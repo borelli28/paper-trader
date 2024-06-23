@@ -4,6 +4,15 @@
     ViewData["Title"] = "Home";
 }
 
+@{
+    if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+}
+
 <div class="text-center">
     <h1 class="display-4">Paper Trader</h1>
     <h4>Your Portfolios</h4>
