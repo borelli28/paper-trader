@@ -34,6 +34,7 @@ namespace PaperTrader.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StockTicker,Name,SharesTotal,ShareAvgPurchasePrice")] Stock stock, int portfolioId)
         {
+            _logger.LogInformation($"Received PortfolioId: {portfolioId}");
             if (ModelState.IsValid)
             {
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
