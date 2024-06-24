@@ -1,0 +1,62 @@
+@model PaperTrader.Models.Stock
+
+@{
+    ViewData["Title"] = "Add Stock";
+}
+
+<h1>Add Stock</h1>
+
+@{
+    if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="portfolioId" value="@ViewBag.portfolioId" />
+
+            <div class="form-group">
+                <label asp-for="StockTicker" class="control-label">Ticker Symbol</label>
+                <input asp-for="StockTicker" class="form-control" />
+                <span asp-validation-for="StockTicker" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="SharesTotal" class="control-label">Shares to Purchase</label>
+                <input asp-for="SharesTotal" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="SharesTotal" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="ShareAvgPurchasePrice" class="control-label">Share Purchase Price</label>
+                <input asp-for="ShareAvgPurchasePrice" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="ShareAvgPurchasePrice" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="App" asp-action="Home">Go Home</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

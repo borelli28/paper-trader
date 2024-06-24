@@ -16,6 +16,6 @@ public class Stock
     public decimal Earnings { get; set; } = 0.00m;
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-    public int PortfolioId { get; set; }
-    public required Portfolio Portfolio { get; set; }
+    public required int PortfolioId { get; set; }
+    public Portfolio? Portfolio { get; set; }
 }
