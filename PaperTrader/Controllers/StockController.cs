@@ -23,5 +23,53 @@ namespace PaperTrader.Controllers
             _context = context;
             _logger = logger;
         }
+        
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("PortfolioId,StockTicker,Name,SharesTotal,ShareAvgPurchasePrice")] Stock stock, int portfolioId)
+        {
+            if (ModelState.IsValid)
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Id.ToString() == loggedInUserId);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                var existingPortfolio = await _context.Portfolio
+                    .FirstOrDefaultAsync(p => p.Id == portfolioId && p.UserId == user.Id);
+
+                if (existingPortfolio == null)
+                {
+                    ModelState.AddModelError("Name", "Could not find portfolio with that name.");
+                    return View(stock);
+                }
+
+                stock.PortfolioId = existingPortfolio.Id;
+                _context.Stock.Add(stock);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Stock added to portfolio!";
+                return RedirectToAction("Home", "App");
+            }
+            else
+            {
+                _logger.LogWarning("ModelState is invalid");
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _logger.LogWarning($"ModelState Error: {error.ErrorMessage}");
+                    }
+                }
+            }
+            return View(stock);
+        }
     }
 }
