@@ -49,7 +49,7 @@ namespace PaperTrader.Controllers
 
                 if (existingPortfolio == null)
                 {
-                    ModelState.AddModelError("Name", "Could not find portfolio with that name.");
+                    TempData["ErrorMessage"] = "Could not find portfolio";
                     return View(stock);
                 }
 
