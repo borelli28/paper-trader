@@ -24,14 +24,15 @@ namespace PaperTrader.Controllers
             _logger = logger;
         }
         
-        public IActionResult Create()
+        public IActionResult Create(int portfolioId)
         {
+            ViewBag.PortfolioId = portfolioId;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PortfolioId,StockTicker,Name,SharesTotal,ShareAvgPurchasePrice")] Stock stock, int portfolioId)
+        public async Task<IActionResult> Create([Bind("StockTicker,Name,SharesTotal,ShareAvgPurchasePrice")] Stock stock, int portfolioId)
         {
             if (ModelState.IsValid)
             {
