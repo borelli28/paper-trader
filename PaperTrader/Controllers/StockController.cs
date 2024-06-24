@@ -49,6 +49,7 @@ namespace PaperTrader.Controllers
 
                 if (existingPortfolio == null)
                 {
+                    _logger.LogWarning($"ModelState Error: Could not find portfolio");
                     TempData["ErrorMessage"] = "Could not find portfolio";
                     return View(stock);
                 }
