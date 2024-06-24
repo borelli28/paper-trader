@@ -57,7 +57,10 @@ namespace PaperTrader.Controllers
 
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var user = await _context.User.FirstOrDefaultAsync(m => m.Id.ToString() == loggedInUserId);
-                var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == id);
+                var portfolio = await _context.Portfolio
+                    .Include(p => p.Stocks)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+
                 if (portfolio == null)
                 {
                     return NotFound();
