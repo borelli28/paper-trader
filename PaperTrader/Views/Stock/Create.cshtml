@@ -6,6 +6,15 @@
 
 <h1>Add Stock</h1>
 
+@{
+    if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+}
+
 <hr />
 <div class="row">
     <div class="col-md-4">
