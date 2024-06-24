@@ -24,9 +24,9 @@ namespace PaperTrader.Controllers
             _logger = logger;
         }
         
-        public IActionResult Create(int portfolioId)
+        public IActionResult Create(int id)
         {
-            ViewBag.PortfolioId = portfolioId;
+            ViewBag.portfolioId = id;
             return View();
         }
 
@@ -34,7 +34,6 @@ namespace PaperTrader.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StockTicker,Name,SharesTotal,ShareAvgPurchasePrice")] Stock stock, int portfolioId)
         {
-            _logger.LogInformation($"Received PortfolioId: {portfolioId}");
             if (ModelState.IsValid)
             {
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
