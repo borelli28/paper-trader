@@ -73,5 +73,10 @@ namespace PaperTrader.Controllers
             }
             return View(stock);
         }
+        
+        private bool StockExists(int id)
+        {
+            return _context.Stock.Any(e => e.Id == id);
+        }
     }
 }
