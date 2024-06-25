@@ -74,6 +74,36 @@ namespace PaperTrader.Controllers
             return View(stock);
         }
         
+        public async Task<IActionResult> Delete(int? id)
+        {   
+            if (User.Identity.IsAuthenticated)
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var stock = await _context.Stock.FirstOrDefaultAsync(m => m.Id == id);
+                var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == stock.PortfolioId);
+
+                if (stock == null || portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
+                    return Unauthorized();
+                }
+
+                return View(portfolio);
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
+        
         private bool StockExists(int id)
         {
             return _context.Stock.Any(e => e.Id == id);
