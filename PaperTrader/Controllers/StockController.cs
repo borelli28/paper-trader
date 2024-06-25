@@ -96,7 +96,7 @@ namespace PaperTrader.Controllers
                     return Unauthorized();
                 }
 
-                return View(portfolio);
+                return View(stock);
             }
             else
             {
