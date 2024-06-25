@@ -104,6 +104,38 @@ namespace PaperTrader.Controllers
             }
         }
         
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var stock = await _context.Stock.FindAsync(id);
+                var portfolio = await _context.Portfolio.FindAsync(stock.PortfolioId);
+
+                if (stock == null || portfolio == null)
+                {
+                    return NotFound();
+                }
+                else if (portfolio.UserId.ToString() != loggedInUserId)
+                {
+                    return Unauthorized();
+                }
+                else
+                {
+                    _context.Stock.Remove(stock);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Stock deleted successfully!";
+                }
+                return RedirectToAction("Home", "App");
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
+        }
+        
         private bool StockExists(int id)
         {
             return _context.Stock.Any(e => e.Id == id);
