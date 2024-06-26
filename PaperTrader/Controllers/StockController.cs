@@ -73,6 +73,58 @@ namespace PaperTrader.Controllers
             }
             return View(stock);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("StockTicker,Name,SharesTotal,ShareAvgPurchasePrice,ClosePrice,MarketCap,AvgVolume,Earnings")] Stock stock)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "User");
+            }
+        
+            if (id != stock.Id)
+            {
+                return NotFound();
+            }
+        
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var portfolio = await _context.Portfolio.FirstOrDefaultAsync(m => m.Id == stock.PortfolioId);
+        
+            if (portfolio == null)
+            {
+                return NotFound();
+            }
+        
+            if (portfolio.UserId.ToString() != loggedInUserId)
+            {
+                return Unauthorized();
+            }
+        
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    stock.PortfolioId = portfolio.Id;
+                    _context.Update(stock);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Stock updated successfully!";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!StockExists(stock.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Home", "App");
+            }
+            return RedirectToAction("Home", "App");
+        }
         
         public async Task<IActionResult> Delete(int? id)
         {   
