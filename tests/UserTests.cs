@@ -1,15 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using PaperTrader.Controllers;
 using PaperTrader.Data;
 using PaperTrader.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Moq;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
 
 namespace PaperTrader.Tests
 {
@@ -17,30 +13,33 @@ namespace PaperTrader.Tests
     public class UserControllerTests
     {
         private UserController _controller;
-        private Mock<PaperTraderContext> _mockContext;
-        private Mock<IPasswordHasher<User>> _mockPasswordHasher;
+        private PaperTraderContext _context;
+        private IPasswordHasher<User> _passwordHasher;
 
         [SetUp]
         public void Setup()
         {
-            _mockContext = new Mock<PaperTraderContext>();
-            _mockPasswordHasher = new Mock<IPasswordHasher<User>>();
-            _controller = new UserController(_mockContext.Object, _mockPasswordHasher.Object);
-        }
+            // Setup in-memory database
+            var options = new DbContextOptionsBuilder<PaperTraderContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .Options;
+            _context = new PaperTraderContext(options);
 
-        [TearDown]
-        public void TearDown()
-        {
-            _controller?.Dispose();
+            // Add test data
+            _context.User.Add(new User { Id = 1, Username = "existinguser", Password = "hashedpassword" });
+            _context.SaveChanges();
+
+            // Use real password hasher
+            _passwordHasher = new PasswordHasher<User>();
+
+            _controller = new UserController(_context, _passwordHasher);
         }
 
         [Test]
         public async Task Register_ValidUser_RedirectsToLogin()
         {
             // Arrange
-            var user = new User { Username = "testuser", Password = "password" };
-            _mockContext.Setup(c => c.User.FirstOrDefaultAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User)null);
+            var user = new User { Username = "newuser", Password = "password" };
 
             // Act
             var result = await _controller.Register(user) as RedirectToActionResult;
@@ -56,8 +55,6 @@ namespace PaperTrader.Tests
         {
             // Arrange
             var user = new User { Username = "existinguser", Password = "password" };
-            _mockContext.Setup(c => c.User.FirstOrDefaultAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new User());
 
             // Act
             var result = await _controller.Register(user) as ViewResult;
@@ -67,6 +64,12 @@ namespace PaperTrader.Tests
             Assert.That(result.ViewData.ModelState.ContainsKey("Username"), Is.True);
         }
 
-        // Add more tests here...
+        [TearDown]
+        public void TearDown()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
+            _controller.Dispose();
+        }
     }
 }
